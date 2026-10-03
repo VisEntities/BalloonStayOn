@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2024 Game4Freak.io
+ * Copyright (C) 2026 Game4Freak.io
  * This mod is provided under the Game4Freak EULA.
  * Full legal terms can be found at https://game4freak.io/eula/
  */
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Oxide.Plugins
 {
-    [Info("Balloon Stay On", "VisEntities", "1.0.0")]
+    [Info("Balloon Stay On", "VisEntities", "1.0.1")]
     [Description("Stops hot air balloons from turning off automatically.")]
     public class BalloonStayOn : RustPlugin
     {
@@ -42,7 +42,10 @@ namespace Oxide.Plugins
                 return null;
 
             bool turnOn = !balloon.IsOn();
-            balloon.SetFlag(BaseEntity.Flags.On, turnOn, false, true);
+            using (BaseEntity.FlagsUpdateScope flagsUpdateScope = balloon.StartSetFlags(BaseEntity.FlagsUpdateMode.SendNetworkUpdate))
+            {
+                flagsUpdateScope.Set(BaseEntity.Flags.On, turnOn);
+            }
 
             if (turnOn)
             {
